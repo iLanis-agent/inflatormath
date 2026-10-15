@@ -8,7 +8,7 @@ def jsnum(x):
     if isinstance(x,float) and x==int(x): return str(int(x))
     return str(x)
 
-BACKPRESSURE_NORM=0.5; FUSE_NORM=0.8
+BACKPRESSURE_NORM=0.5
 
 def fill_plan(flow_lpm,psi,tire_l):
     if not pos(flow_lpm): return {"error":"the sticker flow must be above zero"}
@@ -49,25 +49,21 @@ def render_duty(r,duty_pct,fill_min,tires):
             +" in every 10; the "+jsnum(tires)+"-tire job is "+jsnum(r["workMin"])+" minutes of work"+w2
             +" - about "+jsnum(r["sessionMin"])+w3+", "+r["verdict"]+".")
 
-def socket_plan(draw_a,fuse_a):
+def draw_plan(draw_a,ref_a):
     if not pos(draw_a): return {"error":"the draw amps must be above zero"}
-    if not pos(fuse_a): return {"error":"the fuse amps must be above zero"}
-    honest_a=fuse_a*FUSE_NORM
-    ratio=draw_a/honest_a
-    if ratio<=1: verdict="the socket holds"
-    elif ratio<=1.25: verdict="on the edge, keep the engine running"
-    else: verdict="blows the fuse"
-    return {"honestA":r1(honest_a),"pct":r1(ratio*100),"verdict":verdict}
+    if not pos(ref_a): return {"error":"the reference amps must be above zero"}
+    pct=draw_a/ref_a*100
+    return {"pct":r1(pct)}
 
-def render_socket(r,draw_a,fuse_a):
-    return ("The "+jsnum(draw_a)+"-amp draw against the "+jsnum(fuse_a)+"-amp fuse's honest "+jsnum(r["honestA"])
-            +" amps (the 0.8 norm, labeled) runs at "+jsnum(r["pct"])+"% of the limit - "+r["verdict"]+".")
+def render_draw(r,draw_a,ref_a):
+    return ("The "+jsnum(draw_a)+"-amp draw is "+jsnum(r["pct"])+"% of the "+jsnum(ref_a)
+            +"-amp reference you entered - a share of that number, not a safe-current rating; follow the vehicle outlet limit and the inflator's instructions, and never defeat or oversize a fuse.")
 
 cases=[]
 def add(tool,args):
     if tool=="fill": r=fill_plan(*args); fn=render_fill
     elif tool=="duty": r=duty_plan(*args); fn=render_duty
-    else: r=socket_plan(*args); fn=render_socket
+    else: r=draw_plan(*args); fn=render_draw
     case={"tool":tool,"args":args,"result":r}
     if "error" not in r: case["render"]=fn(r,*args)
     cases.append(case)
@@ -76,11 +72,11 @@ for a in [(35,12,45),(35,8,45),(20,15,60),(50,10,40),(12,20,55),(30,6,35)]:
     add("fill",a)
 for a in [(40,3,4),(25,5,4),(60,2,4),(30,2,2),(50,4,3),(20,3,6)]:
     add("duty",a)
-for a in [(10,15),(14,15),(16,15),(8,10),(12,15),(20,20)]:
-    add("socket",a)
+for a in [(10,12),(14,12),(16,12),(8,8),(12,12),(20,16)]:
+    add("draw",a)
 add("fill",[0,12,45]); add("fill",[35,0,45]); add("fill",[35,12,0])
 add("duty",[0,3,4]); add("duty",[110,3,4]); add("duty",[40,0,4]); add("duty",[40,3,0])
-add("socket",[0,15]); add("socket",[10,0])
+add("draw",[0,12]); add("draw",[10,0])
 
 json.dump(cases,open("expected.json","w"),separators=(",",":"))
 print(len(cases),"cases")
