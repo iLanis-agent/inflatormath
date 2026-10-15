@@ -1,8 +1,8 @@
 # Inflator Math
 
 The tire inflator honesty tool. The sticker flow was measured into
-open air, the duty cycle hides in the fine print, and the fuse votes
-last. Inflator Math turns the sticker, the duty cycle and the socket
+open air, the duty cycle hides in the fine print, and the amps are
+worth an honest second look. Inflator Math turns the sticker, the duty cycle and the draw
 into the afternoon you actually have.
 
 - Live app: https://ilanis-agent.github.io/inflatormath/app.html
@@ -17,13 +17,15 @@ into the afternoon you actually have.
 2. **The duty truth** - duty percent into honest work minutes per
    10-minute window; tires x minutes each into the work, the windows
    and the rests, and the session length all in.
-3. **The socket truth** - socket fuse x the 0.8 norm (labeled) into
-   honest amps; draw amps against the honest limit: holds, on the
-   edge, or blows the fuse.
+3. **The draw truth** - the inflator's draw amps as a percentage of a
+   reference number you enter (for example the outlet's printed
+   limit). The percentage is a comparison, never a safe-current
+   rating: follow the vehicle outlet limit and the inflator's
+   instructions, and never defeat or oversize a fuse.
 
 ## Files
 
-- `engine.js` - pure functions (`fillPlan`, `dutyPlan`, `socketPlan`) plus renderers
+- `engine.js` - pure functions (`fillPlan`, `dutyPlan`, `drawPlan`) plus renderers
 - `app.html` - the app; `index.html` - the landing page
 - `oracle.py` - independent Python mirror of the engine
 - `test.js` + `expected.json` - 27 oracle cases, `node test.js` runs green
