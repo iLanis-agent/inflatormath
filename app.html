@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inflator Math - app</title>
+<link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css">
+<style>
+  :root { --accent: #8a6a2a; }
+  h1 { color: var(--accent); margin-bottom: 0.2em; }
+  .tag { color: var(--accent); font-style: italic; }
+  .card { border: 1px solid #ddd; border-left: 4px solid var(--accent); padding: 1em 1.2em; margin: 1.2em 0; border-radius: 4px; }
+  .big { font-size: 1.2rem; font-weight: 700; color: var(--accent); margin-top: 0.8em; }
+  .err { color: #b00; font-weight: 700; }
+  label { display: block; margin-top: 0.6em; font-size: 0.9em; }
+  input, select { max-width: 12em; }
+  .foot { margin-top: 2.5em; font-size: 0.85em; color: #777; }
+</style>
+</head>
+<body>
+<h1>Inflator Math</h1>
+<p class="tag">Fill truth, duty truth and socket truth - labeled norms, honest arithmetic.</p>
+
+<div class="card">
+  <h3>The fill truth</h3>
+  <label for="f-flow">Sticker flow (liters per minute)</label>
+  <input id="f-flow" type="number" step="any" value="35">
+  <label for="f-psi">PSI to add</label>
+  <input id="f-psi" type="number" step="any" value="12">
+  <label for="f-tire">Tire volume (liters: 35 compact, 45 sedan, 60 truck)</label>
+  <input id="f-tire" type="number" step="any" value="45">
+  <p class="big" id="f-out"></p>
+</div>
+
+<div class="card">
+  <h3>The duty truth</h3>
+  <label for="d-duty">Duty cycle (percent)</label>
+  <input id="d-duty" type="number" step="any" value="40">
+  <label for="d-fill">Minutes per tire</label>
+  <input id="d-fill" type="number" step="any" value="3">
+  <label for="d-tires">Tires to fill</label>
+  <input id="d-tires" type="number" step="any" value="4">
+  <p class="big" id="d-out"></p>
+</div>
+
+<div class="card">
+  <h3>The socket truth</h3>
+  <label for="s-draw">Inflator draw (amps)</label>
+  <input id="s-draw" type="number" step="any" value="10">
+  <label for="s-fuse">Socket fuse (amps)</label>
+  <input id="s-fuse" type="number" step="any" value="15">
+  <p class="big" id="s-out"></p>
+</div>
+
+<p class="foot">The 0.5 back-pressure norm and the 0.8 fuse norm are labeled norms - the arithmetic is honest, and the fourth tire at dusk keeps the honest ledger.</p>
+
+<script src="engine.js"></script>
+<script>
+function g(id){ return document.getElementById(id); }
+function v(id){ var n = parseFloat(g(id).value); return isNaN(n) ? NaN : n; }
+function show(id, s, bad){ var el = g(id); el.textContent = s; el.className = bad ? "err big" : "big"; }
+
+function runFill(){
+  var args = [v("f-flow"), v("f-psi"), v("f-tire")];
+  var r = InflatorMath.fillPlan.apply(null, args);
+  if (r.error) return show("f-out", r.error, true);
+  show("f-out", InflatorMath.renderFill.apply(null, [r].concat(args)), false);
+}
+function runDuty(){
+  var args = [v("d-duty"), v("d-fill"), v("d-tires")];
+  var r = InflatorMath.dutyPlan.apply(null, args);
+  if (r.error) return show("d-out", r.error, true);
+  show("d-out", InflatorMath.renderDuty.apply(null, [r].concat(args)), false);
+}
+function runSocket(){
+  var args = [v("s-draw"), v("s-fuse")];
+  var r = InflatorMath.socketPlan.apply(null, args);
+  if (r.error) return show("s-out", r.error, true);
+  show("s-out", InflatorMath.renderSocket.apply(null, [r].concat(args)), false);
+}
+["f-flow", "f-psi", "f-tire"].forEach(function(id){ g(id).addEventListener("input", runFill); });
+["d-duty", "d-fill", "d-tires"].forEach(function(id){ g(id).addEventListener("input", runDuty); });
+["s-draw", "s-fuse"].forEach(function(id){ g(id).addEventListener("input", runSocket); });
+runFill(); runDuty(); runSocket();
+</script>
+</body>
+</html>
