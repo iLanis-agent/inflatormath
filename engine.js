@@ -3,7 +3,7 @@ var InflatorMath = (function () {
   function pos(x) { return num(x) && x > 0; }
   function r1(x) { return Math.round(x * 10) / 10; }
   function jsnum(x) { if (typeof x === "number" && isFinite(x) && x === Math.trunc(x)) return String(Math.trunc(x)); return String(x); }
-  var BACKPRESSURE_NORM = 0.5, FUSE_NORM = 0.8;
+  var BACKPRESSURE_NORM = 0.5;
   function fillPlan(flowLpm, psi, tireL) {
     if (!pos(flowLpm)) return { error: "the sticker flow must be above zero" };
     if (!pos(psi)) return { error: "the PSI to add must be above zero" };
@@ -43,20 +43,16 @@ var InflatorMath = (function () {
       + " in every 10; the " + jsnum(tires) + "-tire job is " + jsnum(r.workMin) + " minutes of work" + w2
       + " - about " + jsnum(r.sessionMin) + w3 + ", " + r.verdict + ".";
   }
-  function socketPlan(drawA, fuseA) {
+  function drawPlan(drawA, refA) {
     if (!pos(drawA)) return { error: "the draw amps must be above zero" };
-    if (!pos(fuseA)) return { error: "the fuse amps must be above zero" };
-    var honestA = fuseA * FUSE_NORM;
-    var ratio = drawA / honestA;
-    var verdict = ratio <= 1 ? "the socket holds"
-      : ratio <= 1.25 ? "on the edge, keep the engine running"
-      : "blows the fuse";
-    return { honestA: r1(honestA), pct: r1(ratio * 100), verdict: verdict };
+    if (!pos(refA)) return { error: "the reference amps must be above zero" };
+    var pct = drawA / refA * 100;
+    return { pct: r1(pct) };
   }
-  function renderSocket(r, drawA, fuseA) {
-    return "The " + jsnum(drawA) + "-amp draw against the " + jsnum(fuseA) + "-amp fuse's honest " + jsnum(r.honestA)
-      + " amps (the 0.8 norm, labeled) runs at " + jsnum(r.pct) + "% of the limit - " + r.verdict + ".";
+  function renderDraw(r, drawA, refA) {
+    return "The " + jsnum(drawA) + "-amp draw is " + jsnum(r.pct) + "% of the " + jsnum(refA)
+      + "-amp reference you entered - a share of that number, not a safe-current rating; follow the vehicle outlet limit and the inflator's instructions, and never defeat or oversize a fuse.";
   }
-  return { fillPlan: fillPlan, renderFill: renderFill, dutyPlan: dutyPlan, renderDuty: renderDuty, socketPlan: socketPlan, renderSocket: renderSocket };
+  return { fillPlan: fillPlan, renderFill: renderFill, dutyPlan: dutyPlan, renderDuty: renderDuty, drawPlan: drawPlan, renderDraw: renderDraw };
 })();
 if (typeof module !== "undefined" && module.exports) module.exports = InflatorMath;
