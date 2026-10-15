@@ -3,8 +3,8 @@ const cases = require("./expected.json");
 let fails = 0, checks = 0;
 const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 for (const c of cases) {
-  const fn = c.tool === "fill" ? E.fillPlan : c.tool === "duty" ? E.dutyPlan : E.socketPlan;
-  const rfn = c.tool === "fill" ? E.renderFill : c.tool === "duty" ? E.renderDuty : E.renderSocket;
+  const fn = c.tool === "fill" ? E.fillPlan : c.tool === "duty" ? E.dutyPlan : E.drawPlan;
+  const rfn = c.tool === "fill" ? E.renderFill : c.tool === "duty" ? E.renderDuty : E.renderDraw;
   const r = fn(...c.args);
   checks++;
   if (!eq(r, c.result)) { fails++; console.log("RESULT MISMATCH", c.tool, c.args, JSON.stringify(r), "expected", JSON.stringify(c.result)); }
