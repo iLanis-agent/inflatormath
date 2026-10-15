@@ -15,11 +15,12 @@
   label { display: block; margin-top: 0.6em; font-size: 0.9em; }
   input, select { max-width: 12em; }
   .foot { margin-top: 2.5em; font-size: 0.85em; color: #777; }
+  .note { border: 1px solid var(--accent); border-radius: 4px; padding: 0.6em 0.8em; font-size: 0.85em; font-weight: 600; color: var(--accent); margin-top: 0.9em; }
 </style>
 </head>
 <body>
 <h1>Inflator Math</h1>
-<p class="tag">Fill truth, duty truth and socket truth - labeled norms, honest arithmetic.</p>
+<p class="tag">Fill truth, duty truth and draw truth - labeled norms, honest arithmetic.</p>
 
 <div class="card">
   <h3>The fill truth</h3>
@@ -44,15 +45,16 @@
 </div>
 
 <div class="card">
-  <h3>The socket truth</h3>
+  <h3>The draw truth</h3>
   <label for="s-draw">Inflator draw (amps)</label>
   <input id="s-draw" type="number" step="any" value="10">
-  <label for="s-fuse">Socket fuse (amps)</label>
-  <input id="s-fuse" type="number" step="any" value="15">
+  <label for="s-fuse">Reference amps you looked up (the outlet's printed limit)</label>
+  <input id="s-fuse" type="number" step="any" value="12">
   <p class="big" id="s-out"></p>
+  <p class="note">A share of the number you entered - never a safe-current rating. Follow the vehicle outlet limit and the inflator's own instructions, and never defeat or oversize a fuse.</p>
 </div>
 
-<p class="foot">The 0.5 back-pressure norm and the 0.8 fuse norm are labeled norms - the arithmetic is honest, and the fourth tire at dusk keeps the honest ledger.</p>
+<p class="foot">The 0.5 back-pressure norm is a labeled norm; the draw panel compares against a number you enter and rates nothing. Follow the vehicle outlet limit and the inflator's instructions, and never defeat or oversize a fuse.</p>
 
 <script src="engine.js"></script>
 <script>
@@ -72,16 +74,16 @@ function runDuty(){
   if (r.error) return show("d-out", r.error, true);
   show("d-out", InflatorMath.renderDuty.apply(null, [r].concat(args)), false);
 }
-function runSocket(){
+function runDraw(){
   var args = [v("s-draw"), v("s-fuse")];
-  var r = InflatorMath.socketPlan.apply(null, args);
+  var r = InflatorMath.drawPlan.apply(null, args);
   if (r.error) return show("s-out", r.error, true);
-  show("s-out", InflatorMath.renderSocket.apply(null, [r].concat(args)), false);
+  show("s-out", InflatorMath.renderDraw.apply(null, [r].concat(args)), false);
 }
 ["f-flow", "f-psi", "f-tire"].forEach(function(id){ g(id).addEventListener("input", runFill); });
 ["d-duty", "d-fill", "d-tires"].forEach(function(id){ g(id).addEventListener("input", runDuty); });
-["s-draw", "s-fuse"].forEach(function(id){ g(id).addEventListener("input", runSocket); });
-runFill(); runDuty(); runSocket();
+["s-draw", "s-fuse"].forEach(function(id){ g(id).addEventListener("input", runDraw); });
+runFill(); runDuty(); runDraw();
 </script>
 </body>
 </html>
